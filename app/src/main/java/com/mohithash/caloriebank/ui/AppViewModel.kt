@@ -6,6 +6,7 @@ import com.mohithash.caloriebank.ai.AiClient
 import com.mohithash.caloriebank.data.DayTotal
 import com.mohithash.caloriebank.data.Repository
 import com.mohithash.caloriebank.data.Tx
+import com.mohithash.caloriebank.data.TxKind
 import com.mohithash.caloriebank.data.WaterTx
 import com.mohithash.caloriebank.domain.AiSettings
 import com.mohithash.caloriebank.domain.Calc
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -75,6 +77,19 @@ class AppViewModel(private val repo: Repository, private val ai: AiClient) : Vie
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), WaterState())
 
     val ledger: StateFlow<List<Tx>> = repo.allTx.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Running balance after each bank posting, oldest first — feeds the trend chart. */
+    val balanceSeries: StateFlow<List<Pair<String, Int>>> = repo.allTx.map { all ->
+        var run = 0
+        all.filter { it.kind == TxKind.SETTLE || it.kind == TxKind.ADJUST }
+            .sortedBy { it.timestamp }
+            .map { run += it.amount; it.date to run }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Most recently logged distinct foods, for one-tap re-logging. */
+    val recentFoods: StateFlow<List<Tx>> = repo.allTx.map { all ->
+        all.filter { it.kind == TxKind.FOOD }.distinctBy { it.title.lowercase() }.take(8)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _aiUi = MutableStateFlow<AiUi>(AiUi.Idle)
     val aiUi: StateFlow<AiUi> = _aiUi

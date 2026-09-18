@@ -63,7 +63,7 @@ fun CalorieBankNav(vm: AppViewModel) {
 
     Scaffold(
         bottomBar = {
-            if (showBar) NavigationBar {
+            if (showBar) NavigationBar(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainer) {
                 Tab.entries.forEach { tab ->
                     val selected = current?.hierarchy?.any { it.route == tab.route } == true
                     NavigationBarItem(

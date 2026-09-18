@@ -16,8 +16,8 @@ android {
         applicationId = "com.mohithash.caloriebank"
         minSdk = 26
         targetSdk = 37
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
     signingConfigs {
         // release.jks + keystore.properties live in the project root and are git-ignored.
@@ -53,6 +53,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.graphics:graphics-shapes:1.1.0")
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")

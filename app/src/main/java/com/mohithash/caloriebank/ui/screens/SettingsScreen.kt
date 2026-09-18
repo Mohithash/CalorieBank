@@ -15,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -25,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +37,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,6 +54,7 @@ import com.mohithash.caloriebank.domain.AiProvider
 import com.mohithash.caloriebank.domain.Profile
 import com.mohithash.caloriebank.ui.AppViewModel
 import com.mohithash.caloriebank.ui.Label
+import com.mohithash.caloriebank.ui.ShapeIcon
 import com.mohithash.caloriebank.ui.StatCard
 import kotlinx.coroutines.launch
 
@@ -66,18 +71,22 @@ fun SettingsScreen(vm: AppViewModel, onBack: () -> Unit) {
     var testing by remember { mutableStateOf(false) }
     val snack = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val cs = MaterialTheme.colorScheme
 
     fun currentAi() = ai.copy(provider = provider, apiKey = key.trim(), model = model.trim(), baseUrl = baseUrl.trim())
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Settings") }, navigationIcon = { IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }) },
+        topBar = { TopAppBar(title = { Text("Settings") }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface), navigationIcon = { IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }) },
         snackbarHost = { SnackbarHost(snack) },
     ) { pad ->
         Column(Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
             StatCard {
-                Label("AI provider (bring your own key)")
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ShapeIcon(Icons.Default.Key, cs.primaryContainer, cs.onPrimaryContainer, MaterialShapes.Cookie7Sided)
+                    Column { Text("AI provider", style = MaterialTheme.typography.titleMedium); Label("Bring your own key") }
+                }
                 Text("Your key is stored only on this device and sent only to the provider below.", style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)) {
@@ -109,7 +118,10 @@ fun SettingsScreen(vm: AppViewModel, onBack: () -> Unit) {
             }
 
             StatCard {
-                Label("Profile & goal")
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ShapeIcon(Icons.Default.Person, cs.secondaryContainer, cs.onSecondaryContainer, MaterialShapes.Sunny)
+                    Column { Text("Profile & goal", style = MaterialTheme.typography.titleMedium); Label("Re-prices the balance on change") }
+                }
                 Text("Changing weight or goal re-prices the balance to (weight − goal) × 7 700 kcal and posts an adjustment.",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 ProfileForm(profile) { draft = it }
